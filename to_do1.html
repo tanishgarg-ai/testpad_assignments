@@ -12,7 +12,6 @@
         .task span { flex: 1; margin-left: 5px; cursor: pointer; }
         .completed { text-decoration: line-through; color: gray; }
     </style>
-
 </head>
 <body>
 <div id="left">
@@ -23,9 +22,9 @@
     <textarea id="input" placeholder="I need to..." style="width:100%;height:50px;"></textarea>
 </div>
 <script>
-    let tasks = JSON.parse(localStorage.getItem("tasks") || "[]");
+    let tasks = []; // No local storage, tasks only live until refresh
     const taskDiv = document.getElementById("tasks");
-    function save() { localStorage.setItem("tasks", JSON.stringify(tasks)); }
+
     function main() {
         taskDiv.innerHTML = "";
         tasks.forEach((t,i) => {
@@ -35,29 +34,31 @@
             let span = document.createElement("span");
             span.textContent = t.text;
             if(t.done) span.classList.add("completed");
-            span.onclick = () => { t.done = !t.done; save(); main(); };
+            span.onclick = () => { t.done = !t.done; main(); };
 
             let edit = document.createElement("button"); edit.textContent = "Edit";
             edit.onclick = () => {
                 let nt = prompt("Edit task:", t.text);
-                if(nt) { t.text = nt; save(); main(); }
+                if(nt) { t.text = nt; main(); }
             };
 
             let del = document.createElement("button"); del.textContent = "Delete";
-            del.onclick = () => { tasks.splice(i,1); save(); main(); };
+            del.onclick = () => { tasks.splice(i,1); main(); };
 
             div.append(span, edit, del);
             taskDiv.appendChild(div);
         });
     }
+
     document.getElementById("input").addEventListener("keydown", e => {
         if(e.key === "Enter" && e.target.value.trim()){
             e.preventDefault();
             tasks.push({ text: e.target.value.trim(), done: false });
             e.target.value = "";
-            save(); main();
+            main();
         }
     });
+
     main();
 </script>
 </body>
